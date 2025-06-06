@@ -35,8 +35,17 @@ export default function TodosPage() {
   }, [user]);
 
   const fetchTasks = async () => {
-    const res = await api.get('/api/tasks');
-    setTasks(res.data);
+    try {
+      const res = await api.get('/api/tasks');
+      setTasks(res.data);
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        // 未認証の場合はリダイレクトなど（防御的に処理）
+        router.push('/login');
+      } else {
+        console.error(err);
+      }
+    }
   };
 
   const addTask = async () => {
@@ -96,6 +105,7 @@ export default function TodosPage() {
   };
 
   if (isLoading) return <div>読み込み中...</div>;
+  if (!user) return null;
   if (isError) return <div>エラーが発生しました</div>;
 
   return (

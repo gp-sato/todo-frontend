@@ -1,11 +1,21 @@
 import useSWR from 'swr';
 import { api } from './api';
 import { getCsrfToken } from './csrf';
-
-const fetcher = (url: string) => api.get(url).then(res => res.data);
+import { User } from './types';
 
 export const useUser = () => {
-  const { data, error, isLoading } = useSWR('/user', fetcher);
+  const { data, error, isLoading } = useSWR<User>(
+    '/user',
+    async () => {
+      const res = await api.get('/user');
+      return res.data;
+    },
+    {
+      shouldRetryOnError: false, // 無限リトライ防止
+      revalidateOnFocus: false,
+    }
+  );
+
   return {
     user: data,
     isLoading,

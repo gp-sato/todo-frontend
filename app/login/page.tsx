@@ -1,15 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { getCsrfToken } from '@/lib/csrf';
+import { useUser } from '@/lib/auth';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { user, isLoading } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      router.push('/todos');
+    }
+  }, [user, isLoading]);
 
   const login = async (e: React.FormEvent) => {
     e.preventDefault();
