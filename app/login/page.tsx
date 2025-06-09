@@ -1,12 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { getCsrfToken } from '@/lib/csrf';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -17,7 +15,7 @@ export default function LoginPage() {
     try {
       await getCsrfToken();
       await api.post('/login', { email, password });
-      router.push('/todos');
+      window.location.href = '/todos';
     } catch (err: any) {
       setError('ログインに失敗しました');
     }
