@@ -15,6 +15,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [error, setError] = useState('');
+  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
     if (user) {
@@ -38,8 +39,11 @@ export default function RegisterPage() {
       await getCsrfToken();
       window.location.href = '/todos'; // 登録成功でリダイレクト（リロード付きで確実に）
     } catch (err: any) {
-      console.error(err.response?.data);
-      setError('登録に失敗しました');
+      if (err.response?.status === 422) {
+        setValidationErrors(err.response.data.errors);
+      } else {
+        setError('登録に失敗しました');
+      }
     }
   };
 
@@ -58,6 +62,13 @@ export default function RegisterPage() {
             onChange={(e) => setName(e.target.value)}
             required
           />
+          {validationErrors.name && (
+            <ul className="text-red-500 text-sm mt-1 space-y-1">
+              {validationErrors.name.map((message, index) => (
+                <li key={index}>{message}</li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div>
@@ -69,6 +80,13 @@ export default function RegisterPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          {validationErrors.email && (
+            <ul className="text-red-500 text-sm mt-1 space-y-1">
+              {validationErrors.email.map((message, index) => (
+                <li key={index}>{message}</li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div>
@@ -80,6 +98,13 @@ export default function RegisterPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          {validationErrors.password && (
+            <ul className="text-red-500 text-sm mt-1 space-y-1">
+              {validationErrors.password.map((message, index) => (
+                <li key={index}>{message}</li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div>
