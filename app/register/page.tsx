@@ -55,8 +55,9 @@ export default function RegisterPage() {
 
       <form onSubmit={handleRegister} className="space-y-4">
         <div>
-          <label className="block mb-1">名前</label>
+          <label htmlFor='name' className="block mb-1">名前</label>
           <input
+            id='name'
             className="w-full border px-3 py-2"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -72,9 +73,10 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <label className="block mb-1">メールアドレス</label>
+          <label htmlFor='email' className="block mb-1">メールアドレス</label>
           <input
             type="email"
+            id='email'
             className="w-full border px-3 py-2"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -90,9 +92,10 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <label className="block mb-1">パスワード</label>
+          <label htmlFor='password' className="block mb-1">パスワード</label>
           <input
             type="password"
+            id='password'
             className="w-full border px-3 py-2"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -108,9 +111,10 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <label className="block mb-1">パスワード（確認）</label>
+          <label htmlFor='passwordConfirmation' className="block mb-1">パスワード（確認）</label>
           <input
             type="password"
+            id='passwordConfirmation'
             className="w-full border px-3 py-2"
             value={passwordConfirmation}
             onChange={(e) => setPasswordConfirmation(e.target.value)}
