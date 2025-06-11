@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import { getCsrfToken } from '@/lib/csrf';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -32,6 +33,13 @@ export default function LoginPage() {
           className="w-full border px-3 py-2" required />
         <button type="submit" className="w-full bg-blue-500 text-white py-2">ログイン</button>
       </form>
+
+      <div className="mt-4 text-center">
+        <span>アカウントをお持ちでない方は </span>
+        <Link href="/register" className="text-blue-500 hover:underline">
+          ユーザー登録はこちら
+        </Link>
+      </div>
     </div>
   );
 }
