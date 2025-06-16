@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { getCsrfToken } from '@/lib/csrf';
 import { useUser } from '@/lib/auth';
 import { logout } from '@/lib/auth';
+import dayjs from 'dayjs';
 
 type Task = {
   id: number;
@@ -172,9 +173,9 @@ export default function TodosPage() {
                   onChange={(e) => setEditTitle(e.target.value)}
                 />
                 <input
-                  type="date"
+                  type="datetime-local"
                   className="border p-2"
-                  value={editDueDate}
+                  value={editDueDate ? dayjs(editDueDate).format('YYYY-MM-DDTHH:mm') : ''}
                   onChange={(e) => setEditDueDate(e.target.value)}
                 />
                 <div className="flex space-x-2">
@@ -191,7 +192,7 @@ export default function TodosPage() {
                     {task.title}
                   </span>
                   {task.due_date && (
-                    <div className="text-sm text-gray-500">期限: {task.due_date}</div>
+                    <div className="text-sm text-gray-500">期限: {dayjs(task.due_date).format('YYYY-MM-DD HH:mm')}</div>
                   )}
                 </div>
                 <div className="flex space-x-2">
