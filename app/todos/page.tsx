@@ -11,6 +11,7 @@ type Task = {
   id: number;
   title: string;
   is_completed: boolean;
+  due_date: string | null;
 };
 
 export default function TodosPage() {
@@ -23,6 +24,12 @@ export default function TodosPage() {
   const [isToggling, setIsToggling] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+
+  const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDueDate, setEditDueDate] = useState('');
+
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -82,6 +89,37 @@ export default function TodosPage() {
     }
   };
 
+  const startEdit = (task: Task) => {
+    setEditingTaskId(task.id);
+    setEditTitle(task.title);
+    setEditDueDate(task.due_date || '');
+  };
+
+  const cancelEdit = () => {
+    setEditingTaskId(null);
+    setEditTitle('');
+    setEditDueDate('');
+  };
+
+  const saveTask = async (id: number) => {
+    if (isSaving) return; // 二重送信防止
+    setIsSaving(true);
+
+    try {
+      await getCsrfToken();
+      await api.put(`/api/tasks/${id}`, {
+        title: editTitle,
+        due_date: editDueDate,
+      });
+      cancelEdit();
+      fetchTasks();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleLogout = async () => {
     if (loggingOut) return;
     setLoggingOut(true);
@@ -125,25 +163,43 @@ export default function TodosPage() {
 
       <ul className="space-y-2">
         {tasks.map((task) => (
-          <li key={task.id} className="flex justify-between items-center border px-3 py-2">
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={task.is_completed}
-                onChange={() => toggleTask(task)}
-                disabled={isToggling}
-              />
-              <span className={task.is_completed ? 'line-through text-gray-500' : ''}>
-                {task.title}
-              </span>
-            </label>
-            <button
-              className="text-red-500"
-              onClick={() => deleteTask(task.id)}
-              disabled={isDeleting}
-            >
-              削除
-            </button>
+          <li key={task.id} className="flex flex-col border p-3">
+            {editingTaskId === task.id ? (
+              <div className="flex flex-col space-y-2">
+                <input
+                  className="border p-2"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                />
+                <input
+                  type="date"
+                  className="border p-2"
+                  value={editDueDate}
+                  onChange={(e) => setEditDueDate(e.target.value)}
+                />
+                <div className="flex space-x-2">
+                  <button onClick={() => saveTask(task.id)} disabled={isSaving}>
+                    {isSaving ? '保存中...' : '保存'}
+                  </button>
+                  <button onClick={cancelEdit}>キャンセル</button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex justify-between items-center">
+                <div onClick={() => startEdit(task)} className="cursor-pointer">
+                  <span className={task.is_completed ? 'line-through text-gray-500' : ''}>
+                    {task.title}
+                  </span>
+                  {task.due_date && (
+                    <div className="text-sm text-gray-500">期限: {task.due_date}</div>
+                  )}
+                </div>
+                <div className="flex space-x-2">
+                  <button onClick={() => toggleTask(task)} disabled={isToggling}>完了</button>
+                  <button onClick={() => deleteTask(task.id)} disabled={isDeleting}>削除</button>
+                </div>
+              </div>
+            )}
           </li>
         ))}
       </ul>
