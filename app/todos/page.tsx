@@ -20,6 +20,7 @@ export default function TodosPage() {
   const { user, isLoading, isError } = useUser();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState('');
+  const [dueDate, setDueDate] = useState<string>('');
 
   const [isPosting, setIsPosting] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
@@ -31,6 +32,8 @@ export default function TodosPage() {
   const [editDueDate, setEditDueDate] = useState('');
 
   const [isSaving, setIsSaving] = useState(false);
+
+  const [errorMessages, setErrorMessages] = useState<string[]>([]);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -47,16 +50,30 @@ export default function TodosPage() {
     setTasks(res.data);
   };
 
-  const addTask = async () => {
+  const addTask = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (isPosting || !newTask.trim()) return;
+    if (dueDate && dayjs(dueDate).isBefore(dayjs())) {
+      alert('期限は現在より未来の日時を指定してください。');
+      return;
+    }
     setIsPosting(true);
     try {
       await getCsrfToken();
-      await api.post('/api/tasks', { title: newTask });
+      await api.post('/api/tasks', {
+        title: newTask,
+        due_date: dueDate ? dayjs(dueDate).toISOString() : null,
+      });
       setNewTask('');
       fetchTasks();
-    } catch (e) {
-      console.error(e);
+    } catch (error: any) {
+      if (error.response && error.response.status === 422) {
+        const errors = error.response.data.errors as Record<string, string[]>;
+        const messages = Object.values(errors).flat();
+        setErrorMessages(messages);
+      } else {
+        console.error('Unexpected error:', error);
+      }
     } finally {
       setIsPosting(false);
     }
@@ -150,17 +167,31 @@ export default function TodosPage() {
         </button>
       </div>
 
-      <div className="flex mb-4 space-x-2">
+      <form onSubmit={addTask} className="flex mb-4 space-x-2">
         <input
           className="flex-grow border px-3 py-2"
           placeholder="新しいタスクを追加"
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
         />
-        <button className="bg-blue-500 text-white px-4 py-2" onClick={addTask} disabled={isPosting}>
+        <input
+          type="datetime-local"
+          className="flex-grow px-3 py-2"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+          min={dayjs().format('YYYY-MM-DDTHH:mm')}  // 過去禁止
+        />
+        <button type="submit" className="bg-blue-500 text-white px-4 py-2" disabled={isPosting}>
           追加
         </button>
-      </div>
+      </form>
+      {errorMessages.length > 0 && (
+        <div className="text-red-500 mb-4">
+          {errorMessages.map((msg, index) => (
+            <p key={index}>{msg}</p>
+          ))}
+        </div>
+      )}
 
       <ul className="space-y-2">
         {tasks.map((task) => (
