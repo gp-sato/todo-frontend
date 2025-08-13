@@ -7,6 +7,10 @@ import { getCsrfToken } from '@/lib/csrf';
 import { useUser } from '@/lib/auth';
 import { logout } from '@/lib/auth';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 type Task = {
   id: number;
@@ -62,7 +66,7 @@ export default function TodosPage() {
       await getCsrfToken();
       await api.post('/api/tasks', {
         title: newTask,
-        due_date: dueDate ? dayjs(dueDate).toISOString() : null,
+        due_date: dueDate ? dayjs(dueDate).tz('Asia/Tokyo').format('YYYY-MM-DDTHH:mm:ssZ') : null,
       });
       setNewTask('');
       fetchTasks();
