@@ -69,6 +69,7 @@ export default function TodosPage() {
         due_date: dueDate ? dayjs(dueDate).tz('Asia/Tokyo').format('YYYY-MM-DDTHH:mm:ssZ') : null,
       });
       setNewTask('');
+      setDueDate('');
       fetchTasks();
     } catch (error: any) {
       if (error.response && error.response.status === 422) {
