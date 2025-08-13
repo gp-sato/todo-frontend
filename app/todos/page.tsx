@@ -132,7 +132,7 @@ export default function TodosPage() {
       await getCsrfToken();
       await api.put(`/api/tasks/${id}`, {
         title: editTitle,
-        due_date: editDueDate,
+        due_date: editDueDate ? dayjs(editDueDate).tz('Asia/Tokyo').format('YYYY-MM-DDTHH:mm:ssZ') : null,
       });
       cancelEdit();
       fetchTasks();
