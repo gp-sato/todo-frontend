@@ -131,8 +131,14 @@ export default function TodosPage() {
       });
       cancelEdit();
       fetchTasks();
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      if (error.response && error.response.status === 422) {
+        const errors = error.response.data.errors as Record<string, string[]>;
+        const messages = Object.values(errors).flat();
+        setErrorMessages(messages);
+      } else {
+        console.error('Unexpected error:', error);
+      }
     } finally {
       setIsSaving(false);
     }
