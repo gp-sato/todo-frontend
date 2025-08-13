@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { getCsrfToken } from '@/lib/csrf';
 import { useUser } from '@/lib/auth';
 import { logout } from '@/lib/auth';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -71,8 +72,8 @@ export default function TodosPage() {
       setNewTask('');
       setDueDate('');
       fetchTasks();
-    } catch (error: any) {
-      if (error.response && error.response.status === 422) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response && error.response.status === 422) {
         const errors = error.response.data.errors as Record<string, string[]>;
         const messages = Object.values(errors).flat();
         setErrorMessages(messages);
@@ -136,8 +137,8 @@ export default function TodosPage() {
       });
       cancelEdit();
       fetchTasks();
-    } catch (error: any) {
-      if (error.response && error.response.status === 422) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response && error.response.status === 422) {
         const errors = error.response.data.errors as Record<string, string[]>;
         const messages = Object.values(errors).flat();
         setErrorMessages(messages);
