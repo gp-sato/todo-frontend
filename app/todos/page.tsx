@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { getCsrfToken } from '@/lib/csrf';
 import { useUser } from '@/lib/auth';
 import { logout } from '@/lib/auth';
+import LogoutButton from './components/LogoutButton';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -170,13 +171,7 @@ export default function TodosPage() {
     <div className="max-w-lg mx-auto p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">タスクリスト</h1>
-        <button
-          className="text-sm text-gray-500 hover:underline disabled:opacity-50"
-          onClick={handleLogout}
-          disabled={loggingOut}
-        >
-          {loggingOut ? 'ログアウト中…' : 'ログアウト'}
-        </button>
+        <LogoutButton onLogout={handleLogout} loggingOut={loggingOut} />
       </div>
 
       <form onSubmit={addTask} className="flex mb-4 space-x-2">
