@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { api } from '@/lib/api';
 import { getCsrfToken } from '@/lib/csrf';
-import axios from 'axios';
+import EditTaskForm from './EditTaskForm';
 import dayjs from 'dayjs';
 
 type Task = {
@@ -21,13 +21,9 @@ type TaskItemProps = {
 
 export default function TaskItem({ task, setTasks, setErrorMessages }: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState(task.title);
-  const [editDueDate, setEditDueDate] = useState(task.due_date || '');
 
   const [isToggling, setIsToggling] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  const [isSaving, setIsSaving] = useState(false);
 
   const toggleTask = async (task: Task) => {
     if (isToggling) return;
@@ -63,62 +59,15 @@ export default function TaskItem({ task, setTasks, setErrorMessages }: TaskItemP
     }
   };
 
-  const saveTask = async (id: number) => {
-    if (isSaving) return; // 二重送信防止
-    setIsSaving(true);
-
-    try {
-      await getCsrfToken();
-      await api.put(`/api/tasks/${id}`, {
-        title: editTitle,
-        due_date: editDueDate ? dayjs(editDueDate).tz('Asia/Tokyo').format('YYYY-MM-DDTHH:mm:ssZ') : null,
-      });
-
-      setTasks(tasks => {
-        return tasks.map(t => t.id === task.id ? {...t, title: editTitle, due_date: editDueDate} : t);
-      });
-      setIsEditing(false);
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error) && error.response && error.response.status === 422) {
-        const errors = error.response.data.errors as Record<string, string[]>;
-        const messages = Object.values(errors).flat();
-        setErrorMessages(messages);
-      } else {
-        console.error('Unexpected error:', error);
-      }
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const cancelEdit = () => {
-    setIsEditing(false);
-    setEditTitle(task.title);
-    setEditDueDate(task.due_date || '');
-  };
-
   return (
     <li key={task.id} className="flex flex-col border p-3">
       {isEditing ? (
-        <div className="flex flex-col space-y-2">
-          <input
-            className="border p-2"
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-          />
-          <input
-            type="datetime-local"
-            className="border p-2"
-            value={editDueDate ? dayjs(editDueDate).format('YYYY-MM-DDTHH:mm') : ''}
-            onChange={(e) => setEditDueDate(e.target.value)}
-          />
-          <div className="flex space-x-2">
-            <button onClick={() => saveTask(task.id)} disabled={isSaving}>
-              {isSaving ? '保存中...' : '保存'}
-            </button>
-            <button onClick={cancelEdit}>キャンセル</button>
-          </div>
-        </div>
+        <EditTaskForm
+          task={task}
+          setTasks={setTasks}
+          setErrorMessages={setErrorMessages}
+          setIsEditing={setIsEditing}
+        />
       ) : (
         <div className="flex justify-between items-center">
           <div onClick={() => setIsEditing(true)} className="cursor-pointer">
