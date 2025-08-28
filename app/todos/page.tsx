@@ -3,16 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { useUser } from '@/lib/auth';
-import { logout } from '@/lib/auth';
+import { useUser, logout } from '@/lib/auth';
 import LogoutButton from './components/LogoutButton';
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 type Task = {
   id: number;

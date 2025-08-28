@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { api } from '@/lib/api';
 import { getCsrfToken } from '@/lib/csrf';
+import { dayjs } from '@/lib/dayjs';
 import EditTaskForm from './EditTaskForm';
-import dayjs from 'dayjs';
 
 type Task = {
   id: number;

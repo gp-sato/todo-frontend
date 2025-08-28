@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import dayjs from 'dayjs';
 import { api } from '@/lib/api';
 import { getCsrfToken } from '@/lib/csrf';
+import { dayjs } from '@/lib/dayjs';
 import axios from 'axios';
 
 type TaskFormProps = {
@@ -26,7 +26,7 @@ export default function TaskForm({ onAdd, setErrorMessages }: TaskFormProps) {
       await getCsrfToken();
       await api.post('/api/tasks', {
         title: newTask,
-        due_date: dueDate ? dayjs(dueDate).tz('Asia/Tokyo').format('YYYY-MM-DDTHH:mm:ssZ') : null,
+        due_date: dueDate ? dayjs(dueDate).format('YYYY-MM-DDTHH:mm:ssZ') : null,
       });
       setNewTask('');
       setDueDate('');

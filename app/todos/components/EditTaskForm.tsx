@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { api } from '@/lib/api';
 import { getCsrfToken } from '@/lib/csrf';
+import { dayjs } from '@/lib/dayjs';
 import axios from 'axios';
-import dayjs from 'dayjs';
 
 type Task = {
   id: number;
@@ -34,7 +34,7 @@ export default function EditTaskForm({ task, setTasks, setErrorMessages, setIsEd
       await getCsrfToken();
       await api.put(`/api/tasks/${id}`, {
         title: editTitle,
-        due_date: editDueDate ? dayjs(editDueDate).tz('Asia/Tokyo').format('YYYY-MM-DDTHH:mm:ssZ') : null,
+        due_date: editDueDate ? dayjs(editDueDate).format('YYYY-MM-DDTHH:mm:ssZ') : null,
       });
 
       setTasks(tasks => {
